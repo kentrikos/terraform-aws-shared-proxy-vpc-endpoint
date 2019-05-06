@@ -17,13 +17,6 @@ Metadata:
       - VpcEndpointServiceName
     -
       Label:
-        default: "Proxy configuration (optional)"
-      Parameters:
-      - HttpProxyParam
-      - HttpsProxyParam
-      - NoProxyParam
-    -
-      Label:
         default: "IAM configuration"
       Parameters:
       - IAMCodeBuildPoliciesARNs
@@ -45,7 +38,7 @@ Parameters:
     NameString:
         Description: String that will be used as basis for naming S3 bucket, CB project, etc.
         Type: String
-        Default: vpc-endpoint-services-nlb
+        Default: shared-proxy-vpc-endpoint
     VpcID:
       Type: AWS::EC2::VPC::Id
       Description: VPC in which CB project will run and where VPC Endpoint will be created
@@ -54,17 +47,7 @@ Parameters:
       Description: List of subnets in which CB will run (only private are supported) and where VPC Endpoint will be created
     VpcEndpointServiceName:
       Type: String
-      Description: Name of VPC Endpoint Service to which attach VPC Endpoint (formatted as: "com.amazonaws.vpce.AWS_REGION.vpce-svc-00000000000000000")
-    HttpProxyParam:
-      Description: Full string for IP or DNS name of http_proxy parameter (including http:// and optional port)
-      Type: String
-    HttpsProxyParam:
-      Description: Full string for IP or DNS name of https_proxy parameter (including http(s):// and optional port)
-      Type: String
-    NoProxyParam:
-      Description: Full string for IP(s) or DNS name(s) of no_proxy parameter (comma separated list, defaults are recommended at minimum).
-      Type: String
-      Default: 169.254.169.254,169.254.170.2,logs.eu-central-1.amazonaws.com,codecommit.eu-central-1.amazonaws.com,git-codecommit.eu-central-1.amazonaws.com,ssm.eu-central-1.amazonaws.com
+      Description: Name of VPC Endpoint Service to which attach VPC Endpoint (formatted as "com.amazonaws.vpce.AWS_REGION.vpce-svc-00000000000000000")
     IAMCodeBuildPoliciesARNs:
       Description: List of IAM policy ARNs to be attached to CodeBuild role (comma separated string, no spaces)
       Default: 'arn:aws:iam::aws:policy/AdministratorAccess'
@@ -91,27 +74,6 @@ Resources:
 ####################################
 # PARAMETERS IN SSM PARAMETER STORE:
 ####################################
-  HttpProxyParamParameterStore:
-    Type: "AWS::SSM::Parameter"
-    Properties:
-      Name: !Sub "/${NameString}/networking/http_proxy"
-      Type: "String"
-      Value: !Ref HttpProxyParam
-
-  HttpsProxyParamParameterStore:
-    Type: "AWS::SSM::Parameter"
-    Properties:
-      Name: !Sub "/${NameString}/networking/https_proxy"
-      Type: "String"
-      Value: !Ref HttpsProxyParam
-
-  NoProxyParamParameterStore:
-    Type: "AWS::SSM::Parameter"
-    Properties:
-      Name: !Sub "/${NameString}/networking/no_proxy"
-      Type: "String"
-      Value: !Ref NoProxyParam
-
   ConfigRepoURLParameterStore:
     Type: "AWS::SSM::Parameter"
     Properties:
@@ -124,7 +86,7 @@ Resources:
     Properties:
       Name: !Sub "/${NameString}/gitrepo/config_repo_path"
       Type: "String"
-      Value: !Ref ConfigRepoURL
+      Value: !Ref ConfigRepoPath
 
 
 ####################################
@@ -180,24 +142,6 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:1.0
         EnvironmentVariables:
-        - Name: HTTP_PROXY
-          Value: !Ref HttpProxyParamParameterStore
-          Type: PARAMETER_STORE
-        - Name: HTTPS_PROXY
-          Value: !Ref HttpsProxyParamParameterStore
-          Type: PARAMETER_STORE
-        - Name: NO_PROXY
-          Value: !Ref NoProxyParamParameterStore
-          Type: PARAMETER_STORE
-        - Name: http_proxy
-          Value: !Ref HttpProxyParamParameterStore
-          Type: PARAMETER_STORE
-        - Name: https_proxy
-          Value: !Ref HttpsProxyParamParameterStore
-          Type: PARAMETER_STORE
-        - Name: no_proxy
-          Value: !Ref NoProxyParamParameterStore
-          Type: PARAMETER_STORE
         - Name: GIT_CONFIGURATION_REPO_URL 
           Value: !Ref ConfigRepoURLParameterStore
           Type: PARAMETER_STORE
@@ -208,7 +152,7 @@ Resources:
           Value: !Ref VpcID
           Type: PLAINTEXT
         - Name: PRIVATE_SUBNET_IDS
-          Value: !Ref PrivateSubnetIDs
+          Value: !Join [ ",", !Ref PrivateSubnetIDs ]
           Type: PLAINTEXT
         - Name: VPC_ENDPOINT_SERVICE_NAME
           Value: !Ref VpcEndpointServiceName
