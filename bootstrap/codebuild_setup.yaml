@@ -25,6 +25,7 @@ Metadata:
         default: "Git repository configuration (e.g. Bitbucket)"
       Parameters:
       - ConfigRepoURL
+      - ConfigRepoBranch
       - ConfigRepoPath
     -
       Label:
@@ -56,6 +57,10 @@ Parameters:
       Description: Full https URL to configuration repository (starting with https://)
       Type: String
       Default: 'https://github.com/kentrikos/terraform-aws-shared-proxy-vpc-endpoint-service.git'
+    ConfigRepoBranch:
+      Description: Name of the git branch or tag to use
+      Type: String
+      Default: 'master'
     ConfigRepoPath:
       Description: Optional path within the configuration repository (use "." if config files are in root directory)
       Type: String
@@ -80,6 +85,13 @@ Resources:
       Name: !Sub "/${NameString}/gitrepo/config_repo_url"
       Type: "String"
       Value: !Ref ConfigRepoURL
+
+  ConfigRepoBranchParameterStore:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "/${NameString}/gitrepo/config_repo_branch"
+      Type: "String"
+      Value: !Ref ConfigRepoBranch
 
   ConfigRepoPathParameterStore:
     Type: "AWS::SSM::Parameter"
@@ -142,8 +154,11 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:1.0
         EnvironmentVariables:
-        - Name: GIT_CONFIGURATION_REPO_URL 
+        - Name: GIT_CONFIGURATION_REPO_URL
           Value: !Ref ConfigRepoURLParameterStore
+          Type: PARAMETER_STORE
+        - Name: GIT_CONFIGURATION_REPO_BRANCH
+          Value: !Ref ConfigRepoBranchParameterStore
           Type: PARAMETER_STORE
         - Name: GIT_CONFIGURATION_REPO_PATH
           Value: !Ref ConfigRepoPathParameterStore
@@ -201,7 +216,7 @@ Resources:
               commands:
                 - env #DEBUG
                 - echo "Cloning configuration repository"
-                - git clone $GIT_CONFIGURATION_REPO_URL terraform
+                - git clone --branch $GIT_CONFIGURATION_REPO_BRANCH --single-branch $GIT_CONFIGURATION_REPO_URL terraform
                 - cd terraform/$GIT_CONFIGURATION_REPO_PATH
                 - echo "Generating terraform.tfvars"
                 - echo "vpc_id=$VPC_ID" >> terraform.tfvars
