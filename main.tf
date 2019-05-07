@@ -15,6 +15,13 @@ resource "aws_vpc_endpoint" "vpce" {
 resource "aws_security_group" "vpce" {
   description = "Control access to VPC Endpoint"
   vpc_id      = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
 }
 
 # Route53:
