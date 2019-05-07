@@ -219,11 +219,12 @@ Resources:
                 - git clone --branch $GIT_CONFIGURATION_REPO_BRANCH --single-branch $GIT_CONFIGURATION_REPO_URL terraform
                 - cd terraform/$GIT_CONFIGURATION_REPO_PATH
                 - echo "Generating terraform.tfvars"
-                - echo "vpc_id=$VPC_ID" >> terraform.tfvars
-                - echo "subets=$PRIVATE_SUBNET_IDS" >> terraform.tfvars
-                - echo "vpc_endpoint_service_name=$VPC_ENDPOINT_SERVICE_NAME" >> terraform.tfvars
+                - echo "vpc_id=\"$VPC_ID\"" >> terraform.tfvars
+                - export PRIVATE_SUBNET_IDS_CONVERTED="$(echo $PRIVATE_SUBNET_IDS | sed -e 's/^/\"/' -e 's/$/\"/' -e 's/,/\",\"/g')"
+                - echo "subnets=[$PRIVATE_SUBNET_IDS_CONVERTED]" >> terraform.tfvars
+                - echo "vpc_endpoint_service_name=\"$VPC_ENDPOINT_SERVICE_NAME\"" >> terraform.tfvars
                 - echo "common_tag = {key=\"$TERRAFORM_TAG_KEY\", value=\"$TERRAFORM_TAG_VALUE\"}" >> terraform.tfvars
-                - echo "region=$AWS_REGION" >> terraform.tfvars
+                - echo "region=\"$AWS_REGION\"" >> terraform.tfvars
                 - cat terraform.tfvars
                 - terraform init -input=false -backend-config=region=$AWS_REGION -backend-config=bucket=$TF_STATE_BUCKET -backend-config=dynamodb_table=$TF_LOCK_TABLE -backend-config=key=$TF_STATE_BUCKET_KEY
                 - echo "$TERRAFORM_ACTION" > /tmp/terraform_action # workaround for bash brackets in yaml
