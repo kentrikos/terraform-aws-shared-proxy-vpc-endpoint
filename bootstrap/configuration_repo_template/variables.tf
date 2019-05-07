@@ -9,3 +9,7 @@ variable "vpc_id" {
 variable "subnets" {
   default = ["subnet-00000000000000000", "subnet-00000000000000000", "subnet-00000000000000000"]
 }
+
+variable "region" {
+  default = ""
+}
