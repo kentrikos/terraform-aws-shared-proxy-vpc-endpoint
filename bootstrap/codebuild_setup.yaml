@@ -56,7 +56,7 @@ Parameters:
     ConfigRepoURL:
       Description: Full https URL to configuration repository (starting with https://)
       Type: String
-      Default: 'https://github.com/kentrikos/terraform-aws-shared-proxy-vpc-endpoint-service.git'
+      Default: 'https://github.com/kentrikos/terraform-aws-shared-proxy-vpc-endpoint.git'
     ConfigRepoBranch:
       Description: Name of the git branch or tag to use
       Type: String
