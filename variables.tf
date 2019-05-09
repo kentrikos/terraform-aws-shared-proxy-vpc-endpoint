@@ -17,7 +17,6 @@ variable "alternative_bucket_name_for_targets" {
   default     = ""
 }
 
-
 variable "common_tag" {
   type        = "map"
   description = "Single tag to be assigned to each resource (that supports tagging) created by this module"

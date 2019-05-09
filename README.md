@@ -7,6 +7,7 @@ Sharing information about targets between producer and consumer side of connecti
 ## Preparations
 
 * The recommended way to use the module is to first deploy VPC Endpoint Service using <https://github.com/kentrikos/terraform-aws-shared-proxy-vpc-endpoint-service> repository.
+* Afterwards, VPC Endpoint can be deployed in a similar manner using CodeBuild project deployed with CloudFormation template that can be found in `bootstrap/' directory.
 
 ## Usage
 
@@ -29,15 +30,17 @@ module "vpc-endpoint-test" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| alternative\_bucket\_name\_for\_targets | Custom S3 bucket name for list of targets for which to create R53 entries (leave empty to use default) | string | `""` | no |
-| common\_tag | Single tag to be assigned to each resource (that supports tagging) created by this module | map | `<map>` | no |
+| alternative_bucket_name_for_targets | Custom S3 bucket name for list of targets for which to create R53 entries (leave empty to use default) | string | `` | no |
+| common_tag | Single tag to be assigned to each resource (that supports tagging) created by this module | map | `<map>` | no |
 | subnets | A list of subnet IDs for VPC Endpoint | list | `<list>` | no |
-| vpc\_endpoint\_service\_name | Name of VPC Endpoint Service to which attach VPC Endpoint | string | n/a | yes |
-| vpc\_id | The identifier of the VPC for VPC Endpoint | string | n/a | yes |
+| vpc_endpoint_service_name | Name of VPC Endpoint Service to which attach VPC Endpoint | string | - | yes |
+| vpc_id | The identifier of the VPC for VPC Endpoint | string | - | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| r53\_private\_zones | List of names of private Route53 zones created |
-| r53\_records | List of names of Route53 records created |
+| r53_private_zones | List of names of private Route53 zones created |
+| r53_records | List of names of Route53 records created |
+| vpce_id | The ID of the VPC endpoint |
+
