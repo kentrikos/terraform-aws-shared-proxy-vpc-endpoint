@@ -1,10 +1,6 @@
 # CloudFormation template to "Create CodeBuild project with required IAM/SG/SSM/CW Logs configuration and S3/DynamoDB for Terraform"
 
 ## Preparations
-* prepare configuration git repository for Terraform (example content in `configuration_repo_example`, use e.g. Bitbucket)
-* ensure access to configuration repository (e.g. bitbucket), either directly or through separate VPC Endpoint Service
-* configure SSH keypair for the above repo for read-only access, pass private key as parameter when creating CloudFormation stack
-* collect HTTP proxy information (hostname:port)
 * ensure access from your VPC to the following AWS services: logs, ssm, s3 (either through the proxy or create VPC Endpoints)
 
 ## Environment variables of CodeBuild project that can be used to controll Terraform
@@ -13,4 +9,5 @@
 
 ## Notes
 * parameters can be adjusted after CFN deployment via AWS Systems Manager Parameter Store
-* SSH private key is stored in SSM unencrypted as AWS CloudFormation doesn't support the SecureString parameter type (https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-parameter.html)
+* separate configuration repository is not necessary (and optional) for this bootstrap as it is generated on-the-fly from `bootstrap/configuration_repo_template` and parameters passed
+  via CloudFormation (that are collected in `terraform.tfvars`)
