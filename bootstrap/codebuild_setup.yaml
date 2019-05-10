@@ -60,7 +60,7 @@ Parameters:
     ConfigRepoBranch:
       Description: Name of the git branch or tag to use
       Type: String
-      Default: 'master'
+      Default: '0.1.1'
     ConfigRepoPath:
       Description: Optional path within the configuration repository (use "." if config files are in root directory)
       Type: String
