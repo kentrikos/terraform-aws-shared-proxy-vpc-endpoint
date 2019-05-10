@@ -25,7 +25,8 @@ module "vpc-endpoint-test" {
 
 * Targets on producer-side that share exactly the same DNS name and only differ by ports may cause conflicts when creating R53 records.
   To workaround (or customize R53 entries) you can provide custom list of targets via `alternative_bucket_name_for_targets` variable.
-* When releasing new version (tag) of this module it is recommended to update default value for 'ConfigRepoBranch' parameter in `bootstrap/codebuild_setup.yaml`.
+* When releasing new version (tag) of this module it is recommended to update default value for 'ConfigRepoBranch' parameter in `bootstrap/codebuild_setup.yaml`
+  and `?ref` parameter for module's source in `bootstrap/configuration_repo_template/main.tf`.
 
 ## Inputs
 
